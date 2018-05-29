@@ -7,7 +7,7 @@ utils=require("utils")
 
 module.exports.loop = function () {
     utils.elog("Tick", globals.tick)
-
+    utils.elog("Tick2", globals.tick)
     globals.tick++
     for (var id in Game.spawns) {
         Game.spawns[id].spawner()
