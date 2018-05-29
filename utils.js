@@ -20,6 +20,7 @@ module.exports = {
 	cleanCreeps: function() {
 		for(var i in Memory.creeps) {
 		    if(!Game.creeps[i]) {
+		        utils.elog("Deleted", Memory.creeps[i], Memory.creeps[i].name)
 		        delete Memory.creeps[i];
 		    }
 		}
