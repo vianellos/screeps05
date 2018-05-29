@@ -8,7 +8,6 @@ brain.init()
 
 module.exports.loop = function () {
 	brain.tick()
-    globals.tick++
     for (var id in Game.spawns) {
         Game.spawns[id].spawner()
     }

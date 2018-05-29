@@ -9,9 +9,21 @@
 
 module.exports = {
     /** @param {Creep} creep **/
-    elog: function(msg, val) {
-        console.log(msg+": "+JSON.stringify(val))
+    elog: function(msg, val, name=false) {
+		if (name) {
+			console.log(name+" -> "+msg+": "+JSON.stringify(val))
+		}
+		else {
+        	console.log(msg+": "+JSON.stringify(val))
+		}
     } ,
+	cleanCreeps: function() {
+		for(var i in Memory.creeps) {
+		    if(!Game.creeps[i]) {
+		        delete Memory.creeps[i];
+		    }
+		}
+	},
     getGoals: function (gro, gt, gra) {
         let goals = _.map(gro.find(gt), function(source) {
                 return { pos: source.pos, range: gra };

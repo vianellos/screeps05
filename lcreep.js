@@ -1,7 +1,7 @@
 Creep.prototype.ljob = function() {
    switch (this.memory.role) {
         case "harvester":
-            this.harvester()   
+            this.harvester()
         break;
    }
 }
@@ -14,9 +14,9 @@ Creep.prototype.harvester = function() {
             this.memory.targety=target.pos.y
             this.memory.targetr=1
             this.memory.targeti=target.id
-            utils.elog(this.name+"target set", target)
+            utils.elog("target set", target, this.name)
             path2=this.pos.findPathTo(target, {range: 1})
-            utils.elog(this.name+"path set",path2)
+            utils.elog("path set",path2, this.name)
             this.memory.sp=Room.serializePath(path2)
             this.memory.jobstatus=1
         break;
@@ -31,7 +31,7 @@ Creep.prototype.harvester = function() {
             else {
                 switch(res) {
                     case -5:
-                        this.memory.jobstatus=0 
+                        this.memory.jobstatus=0
                     break;
                     case 0:
                         if (this.isArrived()){
@@ -48,19 +48,19 @@ Creep.prototype.harvester = function() {
                     break;
                 }
             }
-            utils.elog(this.name+"res",res)
+            utils.elog("res",res, this.name)
             //utils.elog("pos2",this.pos)
-            utils.elog(this.name+"arrived",this.isArrived())
+            utils.elog("arrived",this.isArrived(), this.name)
         break;
         case 2:
             target=Game.getObjectById(this.memory.targeti)
             //utils.elog(this.name+"target3",t3)
             res=this.harvest(target)
-            utils.elog(this.name+"res har",res)
+            utils.elog("res har",res, this.name)
             //this.memory.jobstatus=0
         break;
     }
-    
+
 }
 
 Creep.prototype.isArrived = function() {
