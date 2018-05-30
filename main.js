@@ -1,6 +1,7 @@
 brain=require("brain")
 require("spawner")
 require("lcreep")
+require("lroom")
 globals=require("globals")
 utils=require("utils")
 

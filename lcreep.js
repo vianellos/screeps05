@@ -1,18 +1,28 @@
 Creep.prototype.ljob = function() {
+	//this.suicide()
+	if (!this.spawning) {
+		switch (this.memory.role) {
+			case "starter":
+				this.harvester()
+			break;
+			case "builder":
 
-   switch (this.memory.role) {
-        case "harvester":
-            this.harvester()
-        break;
-   }
+			break;
+		}
+	}
 }
 
 Creep.prototype.harvester = function() {
+	utils.elog("harv", this.memory.jobstatus, this.name)
     switch (this.memory.jobstatus) {
         case 0:
 			if (this.setNewTarget(FIND_SOURCES_ACTIVE, {}, 1)) {
 	            this.memory.jobstatus=1
 				this.harvester()
+			}
+			else {
+				globals.bodies[this.memory.bodyid].toCreate=false;
+				utils.elog("Stop creating 1", this.memory.bodyid, this.name)
 			}
         break;
         case 1:
@@ -45,6 +55,10 @@ Creep.prototype.harvester = function() {
 				this.memory.jobstatus=4
 				this.harvester()
 			}
+			else {
+				globals.bodies[this.memory.bodyid].toCreate=false;
+				utils.elog("Stop creating 2", this.memory.bodyid, this.name)
+			}
 		break;
 		case 4:
 			m=this.lMove()
@@ -73,7 +87,7 @@ Creep.prototype.harvester = function() {
     }
 }
 
-Creep.prototype.setNewTarget(ty, fi, ra) {
+Creep.prototype.setNewTarget = function(ty, fi, ra) {
 	target=this.pos.findClosestByPath(ty, fi)
 	if (target) {
 		this.memory.targetx=target.pos.x
@@ -92,7 +106,7 @@ Creep.prototype.setNewTarget(ty, fi, ra) {
 	}
 }
 
-Creep.prototype.doAction(ty, opt) {
+Creep.prototype.doAction=function (ty, opt) {
 	target=Game.getObjectById(this.memory.targeti)
 	if (target) {
 		if (opt) {
