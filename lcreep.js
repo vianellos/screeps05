@@ -10,90 +10,102 @@ Creep.prototype.ljob = function() {
 Creep.prototype.harvester = function() {
     switch (this.memory.jobstatus) {
         case 0:
-            target=this.pos.findClosestByPath(FIND_SOURCES_ACTIVE)
-			if (target) {
-	            this.memory.targetx=target.pos.x
-	            this.memory.targety=target.pos.y
-	            this.memory.targetr=1
-	            this.memory.targeti=target.id
-				this.memory.lx=0
-				this.memory.ly=0
-				this.memory.lf=0
-	            path2=this.pos.findPathTo(target, {range: 1})
-	            this.memory.sp=Room.serializePath(path2)
+			if (this.setNewTarget(FIND_SOURCES_ACTIVE, {}, 1)) {
 	            this.memory.jobstatus=1
 				this.harvester()
 			}
         break;
         case 1:
 			m=this.lMove()
-			if (m==1) {
-				this.memory.jobstatus=2
-				this.harvester()
-			}
-			else if (m==-101) {
-				this.memory.jobstatus=0
+			switch (m) {
+				case 1:
+					this.memory.jobstatus=2
+					this.harvester()
+				break;
+				case -101:
+					this.memory.jobstatus=0
+				break;
 			}
         break;
         case 2:
-            target=Game.getObjectById(this.memory.targeti)
-			if (target) {
-	            res=this.harvest(target)
-				if (res==-9) {
+			res=this.doAction("harvest")
+			switch (res) {
+				case -9:
+				case -99:
 					this.memory.jobstatus=0
-				}
-				if (this.carry.energy>=this.carryCapacity) {
-					this.memory.jobstatus=3
-				}
+				break;
 			}
-			else {
-				this.memory.jobstatus=0
+			if (this.carry.energy>=this.carryCapacity) {
+				this.memory.jobstatus=3
 			}
 		break;
 		case 3:
-			rtype=FIND_STRUCTURES
 			rfilter= { filter: (structure) => { return ( ((structure.structureType == STRUCTURE_SPAWN) && structure.energy < structure.energyCapacity)); } }
-			target=this.pos.findClosestByPath(rtype, rfilter)
-			if (target) {
-				this.memory.targetx=target.pos.x
-				this.memory.targety=target.pos.y
-				this.memory.targetr=1
-				this.memory.targeti=target.id
-				this.memory.lx=0
-				this.memory.ly=0
-				this.memory.lf=0
-				path2=this.pos.findPathTo(target, {range: 1})
-				this.memory.sp=Room.serializePath(path2)
+			if (this.setNewTarget(FIND_STRUCTURES, rfilter, 1)) {
 				this.memory.jobstatus=4
 				this.harvester()
 			}
 		break;
 		case 4:
 			m=this.lMove()
-			if (m==1) {
-				this.memory.jobstatus=5
-				this.harvester()
-			}
-			else if (m==-101) {
-				this.memory.jobstatus=3
+			switch (m) {
+				case 1:
+					this.memory.jobstatus=5
+					this.harvester()
+				break;
+				case -101:
+					this.memory.jobstatus=3
+				break;
 			}
 		break;
 		case 5:
-			target=Game.getObjectById(this.memory.targeti)
-			if (target) {
-				res=this.transfer(target, RESOURCE_ENERGY)
-				if (res==-9) {
+			res=this.doAction("transfer", RESOURCE_ENERGY)
+			switch (res) {
+				case -99:
+				case -9:
 					this.memory.jobstatus=3
-				}
-				if (this.carry.energy==0) {
-					this.memory.jobstatus=0
-				}
+				break;
 			}
-			else {
-				this.memory.jobstatus=3
+			if (this.carry.energy==0) {
+				this.memory.jobstatus=0
 			}
         break;
     }
+}
+
+Creep.prototype.setNewTarget(ty, fi, ra) {
+	target=this.pos.findClosestByPath(ty, fi)
+	if (target) {
+		this.memory.targetx=target.pos.x
+		this.memory.targety=target.pos.y
+		this.memory.targetr=ra
+		this.memory.targeti=target.id
+		this.memory.lx=0
+		this.memory.ly=0
+		this.memory.lf=0
+		path2=this.pos.findPathTo(target, {range: ra})
+		this.memory.sp=Room.serializePath(path2)
+		return true
+	}
+	else {
+		return false
+	}
+}
+
+Creep.prototype.doAction(ty, opt) {
+	target=Game.getObjectById(this.memory.targeti)
+	if (target) {
+		if (opt) {
+			res=this[ty](target, opt)
+		}
+		else {
+			res=this[ty](target)
+		}
+		return res
+	}
+	else {
+		return -99
+	}
 }
 
 Creep.prototype.lMove= function() {
