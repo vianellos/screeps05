@@ -20,7 +20,6 @@ module.exports = {
 	architect: function() {
 		for (var id in Game.rooms) {
 			Game.rooms[id].architect()
-			Game.rooms[id].visual.circle(25,25, {radius:2, stroke:"#ffffff", fill:0})
 		}
 	}
 };

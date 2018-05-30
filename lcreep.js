@@ -6,7 +6,7 @@ Creep.prototype.ljob = function() {
 				this.harvester()
 			break;
 			case "builder":
-
+				this.builder()
 			break;
 		}
 	}
@@ -86,6 +86,83 @@ Creep.prototype.harvester = function() {
         break;
     }
 }
+
+
+
+Creep.prototype.builder = function() {
+	utils.elog("build", this.memory.jobstatus, this.name)
+    switch (this.memory.jobstatus) {
+        case 0:
+			if (this.setNewTarget(FIND_SOURCES_ACTIVE, {}, 1)) {
+	            this.memory.jobstatus=1
+				this.builder()
+			}
+			else {
+				globals.bodies[this.memory.bodyid].toCreate=false;
+				utils.elog("Stop creating 1", this.memory.bodyid, this.name)
+			}
+        break;
+        case 1:
+			m=this.lMove()
+			switch (m) {
+				case 1:
+					this.memory.jobstatus=2
+					this.builder()
+				break;
+				case -101:
+					this.memory.jobstatus=0
+				break;
+			}
+        break;
+        case 2:
+			res=this.doAction("harvest")
+			switch (res) {
+				case -9:
+				case -99:
+					this.memory.jobstatus=0
+				break;
+			}
+			if (this.carry.energy>=this.carryCapacity) {
+				this.memory.jobstatus=3
+			}
+		break;
+		case 3:
+			if (this.setNewTarget(FIND_MY_CONSTRUCTION_SITES, 1)) {
+				this.memory.jobstatus=4
+				this.builder()
+			}
+			else {
+				globals.bodies[this.memory.bodyid].toCreate=false;
+				utils.elog("Stop creating 2", this.memory.bodyid, this.name)
+			}
+		break;
+		case 4:
+			m=this.lMove()
+			switch (m) {
+				case 1:
+					this.memory.jobstatus=5
+					this.builder()
+				break;
+				case -101:
+					this.memory.jobstatus=3
+				break;
+			}
+		break;
+		case 5:
+			res=this.doAction("build")
+			switch (res) {
+				case -99:
+				case -9:
+					this.memory.jobstatus=3
+				break;
+			}
+			if (this.carry.energy==0) {
+				this.memory.jobstatus=0
+			}
+        break;
+    }
+}
+
 
 Creep.prototype.setNewTarget = function(ty, fi, ra) {
 	target=this.pos.findClosestByPath(ty, fi)
