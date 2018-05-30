@@ -2,11 +2,17 @@ Creep.prototype.ljob = function() {
 	//this.suicide()
 	if (!this.spawning) {
 		switch (this.memory.role) {
+			case "harvester":
+				this.harvester()
+			break;
 			case "starter":
 				this.harvester()
 			break;
 			case "builder":
 				this.builder()
+			break;
+			case "upgrader":
+				this.upgrader()
 			break;
 		}
 	}
@@ -87,8 +93,6 @@ Creep.prototype.harvester = function() {
     }
 }
 
-
-
 Creep.prototype.builder = function() {
 	utils.elog("build", this.memory.jobstatus, this.name)
     switch (this.memory.jobstatus) {
@@ -127,7 +131,7 @@ Creep.prototype.builder = function() {
 			}
 		break;
 		case 3:
-			if (this.setNewTarget(FIND_MY_CONSTRUCTION_SITES, 1)) {
+			if (this.setNewTarget(FIND_MY_CONSTRUCTION_SITES,{}, 1)) {
 				this.memory.jobstatus=4
 				this.builder()
 			}
@@ -163,23 +167,115 @@ Creep.prototype.builder = function() {
     }
 }
 
+Creep.prototype.upgrader = function() {
+	utils.elog("upgrade", this.memory.jobstatus, this.name)
+    switch (this.memory.jobstatus) {
+        case 0:
+			if (this.setNewTarget(FIND_SOURCES_ACTIVE, {}, 1)) {
+	            this.memory.jobstatus=1
+				this.upgrader()
+			}
+			else {
+				globals.bodies[this.memory.bodyid].toCreate=false;
+				utils.elog("Stop creating 1", this.memory.bodyid, this.name)
+			}
+        break;
+        case 1:
+			m=this.lMove()
+			switch (m) {
+				case 1:
+					this.memory.jobstatus=2
+					this.upgrader()
+				break;
+				case -101:
+					this.memory.jobstatus=0
+				break;
+			}
+        break;
+        case 2:
+			res=this.doAction("harvest")
+			switch (res) {
+				case -9:
+				case -99:
+					this.memory.jobstatus=0
+				break;
+			}
+			if (this.carry.energy>=this.carryCapacity) {
+				this.memory.jobstatus=3
+			}
+		break;
+		case 3:
+			if (this.setNewTarget("controller",{}, 1)) {
+				this.memory.jobstatus=4
+				this.upgrader()
+			}
+			else {
+				globals.bodies[this.memory.bodyid].toCreate=false;
+				utils.elog("Stop creating 2", this.memory.bodyid, this.name)
+			}
+		break;
+		case 4:
+			m=this.lMove()
+			switch (m) {
+				case 1:
+					this.memory.jobstatus=5
+					this.upgrader()
+				break;
+				case -101:
+					this.memory.jobstatus=3
+				break;
+			}
+		break;
+		case 5:
+			res=this.doAction("upgrade")
+			switch (res) {
+				case -99:
+				case -9:
+					this.memory.jobstatus=3
+				break;
+			}
+			if (this.carry.energy==0) {
+				this.memory.jobstatus=0
+			}
+        break;
+    }
+}
 
 Creep.prototype.setNewTarget = function(ty, fi, ra) {
-	target=this.pos.findClosestByPath(ty, fi)
-	if (target) {
-		this.memory.targetx=target.pos.x
-		this.memory.targety=target.pos.y
-		this.memory.targetr=ra
-		this.memory.targeti=target.id
-		this.memory.lx=0
-		this.memory.ly=0
-		this.memory.lf=0
-		path2=this.pos.findPathTo(target, {range: ra})
-		this.memory.sp=Room.serializePath(path2)
-		return true
+	if (ty=="controller") {
+		if (this.room.controller) {
+			this.memory.targetx=this.room.controller.pos.x
+			this.memory.targety=this.room.controller.pos.y
+			this.memory.targetr=ra
+			this.memory.targeti=this.room.controller.id
+			this.memory.lx=0
+			this.memory.ly=0
+			this.memory.lf=0
+			path2=this.pos.findPathTo(this.room.controller, {range: ra})
+			this.memory.sp=Room.serializePath(path2)
+			return true
+		}
+		else {
+			return false
+		}
 	}
 	else {
-		return false
+		target=this.pos.findClosestByPath(ty, fi)
+		if (target) {
+			this.memory.targetx=target.pos.x
+			this.memory.targety=target.pos.y
+			this.memory.targetr=ra
+			this.memory.targeti=target.id
+			this.memory.lx=0
+			this.memory.ly=0
+			this.memory.lf=0
+			path2=this.pos.findPathTo(target, {range: ra})
+			this.memory.sp=Room.serializePath(path2)
+			return true
+		}
+		else {
+			return false
+		}
 	}
 }
 
