@@ -9,7 +9,7 @@
 
 module.exports = {
     /** @param {Creep} creep **/
-    elog: function(msg, val, name=false) {
+    loLog: function(msg, val, name=false) {
 		if (name) {
 			console.log(name+" -> "+msg+": "+JSON.stringify(val))
 		}
@@ -17,10 +17,28 @@ module.exports = {
         	console.log(msg+": "+JSON.stringify(val))
 		}
     } ,
+	loWarn: function(msg, val, name=false) {
+		if (name) {
+			console.log("WARNING: "+name+" -> "+msg+": "+JSON.stringify(val))
+		}
+		else {
+			console.log("WARNING: "+msg+": "+JSON.stringify(val))
+		}
+	} ,
+	loError: function(msg, val, name=false) {
+		console.log("----------ERROR-----------")
+		if (name) {
+			console.log(name+" -> "+msg+": "+JSON.stringify(val))
+		}
+		else {
+			console.log(msg+": "+JSON.stringify(val))
+		}
+		console.log("------------------------------")
+	} ,
 	cleanCreeps: function() {
 		for(var i in Memory.creeps) {
 		    if(!Game.creeps[i]) {
-		        utils.elog("Deleted", Memory.creeps[i], Memory.creeps[i].name)
+		        utils.loWarn("Deleted", Memory.creeps[i], Memory.creeps[i].name)
 				globals.bodies[Memory.creeps[i].bodyid].toCreate=true;
 		        delete Memory.creeps[i];
 		    }

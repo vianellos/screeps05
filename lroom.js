@@ -7,8 +7,6 @@ Room.prototype.getLevel = function() {
 
 Room.prototype.architect = function() {
 	stru=this.census()
-	utils.elog("struct1", stru)
-	utils.elog("level", this.getLevel())
 	switch (this.getLevel()) {
 		case 1:
 			if (stru.container<4) {
@@ -22,7 +20,6 @@ Room.prototype.architect = function() {
 Room.prototype.census = function() {
 	stru={'container':0, 'extension': 0}
 	for (var id in this.structures) {
-		utils.elog("struct", this.structures[id])
 	}
 	return stru
 }
@@ -43,7 +40,6 @@ Room.prototype.buildSt= function(ty) {
 				npx=Math.floor((sp[spid].pos.x+res[resid].pos.x)/2)
 				npy=Math.floor((sp[spid].pos.y+res[resid].pos.y)/2)
 				emptys=this.findEmptySpace(npx, npy)
-				utils.elog("res empy", emptys)
 				if (emptys) {
 					if (emptys.d<dist) {
 						dist=emptys.d
@@ -55,7 +51,7 @@ Room.prototype.buildSt= function(ty) {
 		if (newcon) {
 			//create=this.createConstructionSite(newcon.x, newcon.y, STRUCTURE_CONTAINER)
 			this.visual.circle(newcon.x,newcon.y, {radius:1, stroke:"#ffffff", fill:0})
-			utils.elog("creo", create)
+			utils.loWarn("Creo", true)
 		}
 	}
 }
