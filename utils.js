@@ -19,10 +19,10 @@ module.exports = {
     } ,
 	loWarn: function(msg, val, name=false) {
 		if (name) {
-			console.log("WARNING: "+name+" -> "+msg+": "+JSON.stringify(val))
+			//console.log("WARNING: "+name+" -> "+msg+": "+JSON.stringify(val))
 		}
 		else {
-			console.log("WARNING: "+msg+": "+JSON.stringify(val))
+			//console.log("WARNING: "+msg+": "+JSON.stringify(val))
 		}
 	} ,
 	loError: function(msg, val, name=false) {
@@ -34,6 +34,11 @@ module.exports = {
 			console.log(msg+": "+JSON.stringify(val))
 		}
 		console.log("------------------------------")
+	} ,
+	loCrLog: function(msg, val, name) {
+		if (name=='upg4_4') {
+			console.log(name+" -> "+msg+": "+JSON.stringify(val))
+		}
 	} ,
 	cleanCreeps: function() {
 		for(var i in Memory.creeps) {

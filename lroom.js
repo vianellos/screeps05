@@ -17,12 +17,15 @@ Room.prototype.architect = function() {
 		this.containers=true
 	}
 	maxcs=1
-	cs=this.find(FIND_MY_CONSTRUCTION_SITES)
+
+	fil={filter: (i) => i.structureType != STRUCTURE_ROAD }
+	cs=this.find(FIND_MY_CONSTRUCTION_SITES, fil)
+
 	if (cs && cs.length>=maxcs) {
 
 	}
 	else {
-		stru=this.census()
+		stru=this.getStruCont()
 		switch (this.getLevel()) {
 			case 1:
 				if (stru.container<4) {
@@ -37,16 +40,42 @@ Room.prototype.architect = function() {
 					this.buildContainer()
 				}
 			break;
+			case 3:
+				if (stru.extension<9) {
+					this.buildExtension()
+				}
+				else if (stru.container<4) {
+					this.buildContainer()
+				}
+			break;
 		}
 	}
-}
 
-Room.prototype.census = function() {
-	stru={'container':0, 'extension': 0}
-	for (var id in this.structures) {
-		this.loLog("structures", this.structures[id])
+	fil={filter: (i) => i.structureType == STRUCTURE_ROAD }
+	csr=this.find(FIND_MY_CONSTRUCTION_SITES, fil)
+
+	if (csr && csr.length>=maxcs) {
+
 	}
-	return stru
+	else {
+		pm=0
+		pc=false
+		for (var co in Memory.pathinfo[this.name]) {
+			if (Memory.pathinfo[this.name][co]>pm) {
+				pm=Memory.pathinfo[this.name][co]
+				pc=co
+			}
+		}
+		if (pc) {
+			coord=pc.split('x')
+			x=parseInt(coord[0])
+			y=parseInt(coord[1])
+			create=this.createConstructionSite(x, y, STRUCTURE_ROAD)
+			this.visual.circle(x,y, {radius:1, stroke:"red", fill:0})
+			utils.loWarn("Creo", coord)
+			Memory.pathinfo={}
+		}
+	}
 }
 
 Room.prototype.buildContainer= function(ty) {
@@ -59,7 +88,6 @@ Room.prototype.buildContainer= function(ty) {
 			npx=Math.floor((sp[spid].pos.x+res[resid].pos.x)/2)
 			npy=Math.floor((sp[spid].pos.y+res[resid].pos.y)/2)
 			emptys=this.findEmptySpace(npx, npy, 2)
-			utils.loWarn("emptys", emptys)
 			if (emptys) {
 				if (emptys.d<dist) {
 					dist=emptys.d
@@ -71,7 +99,7 @@ Room.prototype.buildContainer= function(ty) {
 	if (newcon) {
 		create=this.createConstructionSite(newcon.x, newcon.y, STRUCTURE_CONTAINER)
 		this.visual.circle(newcon.x,newcon.y, {radius:1, stroke:"#ffffff", fill:0})
-		utils.loWarn("Creo", newcon)
+		utils.loWarn("Creo", create)
 	}
 }
 
@@ -93,7 +121,7 @@ Room.prototype.buildExtension= function(ty) {
 	if (newcon) {
 		create=this.createConstructionSite(newcon.x, newcon.y, STRUCTURE_EXTENSION)
 		this.visual.circle(newcon.x,newcon.y, {radius:1, stroke:"#ffffff", fill:0})
-		utils.loWarn("Creo", newcon)
+		utils.loWarn("Creo", create)
 	}
 }
 
@@ -152,7 +180,7 @@ Room.prototype.canBuildAt = function(sx, sy, max) {
 }
 
 Room.prototype.maxCreep = function() {
-	utils.loLog("maxcreep", this.structures)
+	//utils.loLog("maxcreep", this.structures)
 	if (globals.maxcreep!=0) {
 		return globals.maxcreep
 	}
@@ -160,7 +188,7 @@ Room.prototype.maxCreep = function() {
 		maxcreep=10
 		st=this.getStruCont();
 		if (st.container && st.container>0) {
-			maxcreep=15
+			maxcreep=100
 		}
 		globals.maxcreep=maxcreep
 		return globals.maxcreep

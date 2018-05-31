@@ -18,8 +18,9 @@ module.exports = {
 	closeTick: function() {
 		st=this.stuckTotals()
 		//utils.loWarn("stuckinfo",Memory.stuckinfo)
-		utils.loWarn("stucktotals",st)
-		utils.loWarn("CPU", Game.cpu)
+		//utils.loWarn("stucktotals",st)
+		//utils.loWarn("pathinfo",Memory.pathinfo)
+		utils.loWarn("CPU", Game.cpu.getUsed()+"/"+Game.cpu.tickLimit)
 	},
 	architect: function() {
 		for (var id in Game.rooms) {
@@ -34,7 +35,7 @@ module.exports = {
 			Game.rooms[id].loInit()
 		}
 	},
-	stuckinfo: function(ty, ac, st, err) {
+	stuckinfo: function(ty, ac, st) {
 		tick=Game.time
 		//Memory.stuckinfo={}
 		if (!Memory.stuckinfo) {
@@ -61,12 +62,9 @@ module.exports = {
 			Memory.stuckinfo[tick][ty][ac]={}
 		}
 		if (!Memory.stuckinfo[tick][ty][ac][st]) {
-			Memory.stuckinfo[tick][ty][ac][st]={}
+			Memory.stuckinfo[tick][ty][ac][st]=0
 		}
-		if (!Memory.stuckinfo[tick][ty][ac][st][err]) {
-			Memory.stuckinfo[tick][ty][ac][st][err]=0
-		}
-		Memory.stuckinfo[tick][ty][ac][st][err]++
+		Memory.stuckinfo[tick][ty][ac][st]++
 	},
 	stuckTotals: function() {
 		st={}
@@ -86,20 +84,38 @@ module.exports = {
 							st[ty][ac][ste]={}
 							st[ty][ac][ste]['count']=0
 						}
-						for (var err in Memory.stuckinfo[tick][ty][ac][ste]) {
-							if (!st[ty][ac][ste][err]) {
-								st[ty][ac][ste][err]={}
-								st[ty][ac][ste][err]['count']=0
-							}
-							st[ty]['count']+=Memory.stuckinfo[tick][ty][ac][ste][err]
-							st[ty][ac]['count']+=Memory.stuckinfo[tick][ty][ac][ste][err]
-							st[ty][ac][ste]['count']+=Memory.stuckinfo[tick][ty][ac][ste][err]
-							st[ty][ac][ste][err]['count']+=Memory.stuckinfo[tick][ty][ac][ste][err]
-						}
+						st[ty]['count']+=Memory.stuckinfo[tick][ty][ac][ste]
+						st[ty][ac]['count']+=Memory.stuckinfo[tick][ty][ac][ste]
+						st[ty][ac][ste]['count']+=Memory.stuckinfo[tick][ty][ac][ste]
 					}
 				}
 			}
 		}
 	return st
+	},
+	pathinfo: function(r, x, y) {
+		if (!Memory.pathinfo[r]) {
+			Memory.pathinfo[r]={}
+		}
+		if (!Memory.pathinfo[r][x+'x'+y]) {
+			look=Game.rooms[r].lookAt(x, y)
+			str=false
+			for (var id in look) {
+				if (look[id].type=='structure') {
+					str=true
+				}
+			}
+			if (str) {
+				Memory.pathinfo[r][x+'x'+y]=0
+			}
+			else {
+				Memory.pathinfo[r][x+'x'+y]=1
+			}
+		}
+		else {
+			if (Memory.pathinfo[r][x+'x'+y]!=0) {
+				Memory.pathinfo[r][x+'x'+y]++
+			}
+		}
 	}
 };
