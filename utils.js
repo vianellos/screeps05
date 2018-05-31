@@ -39,7 +39,6 @@ module.exports = {
 		for(var i in Memory.creeps) {
 		    if(!Game.creeps[i]) {
 		        utils.loWarn("Deleted", Memory.creeps[i], Memory.creeps[i].name)
-				globals.bodies[Memory.creeps[i].bodyid].toCreate=true;
 		        delete Memory.creeps[i];
 		    }
 		}

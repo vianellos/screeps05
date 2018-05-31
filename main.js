@@ -18,8 +18,7 @@ module.exports.loop = function () {
     }
     for (var id in Game.creeps) {
         Game.creeps[id].loJob()
-		/*fil={ filter : function(object) { if (object.structureType==STRUCTURE_SPAWN && object.energy < object.energyCapacity) {return 1} else {return 0} }}
-		tg=Game.creeps[id].pos.findClosestByPath(FIND_MY_STRUCTURES, fil);
-		utils.loLog("test find", tg)*/
     }
+
+	utils.loWarn("CPU", Game.cpu)
 }

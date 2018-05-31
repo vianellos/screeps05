@@ -16,10 +16,15 @@ module.exports = {
 		globals.tick++
 		utils.cleanCreeps()
 		this.architect()
+		this.resetGlobals()
 	},
 	architect: function() {
 		for (var id in Game.rooms) {
 			Game.rooms[id].architect()
 		}
+	},
+	resetGlobals: function() {
+		globals.currentbody={}
+		globals.maxcreep=0;
 	}
 };
