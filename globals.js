@@ -6,7 +6,7 @@ module.exports = {
     tick: 0,
 	ttlLimit: 100,
 	parkingx:11,
-	parkingx:31,
+	parkingy:31,
 	maxcreep:0,
 	mincreep:0,
     bodies: {

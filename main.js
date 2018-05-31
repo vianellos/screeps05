@@ -19,6 +19,5 @@ module.exports.loop = function () {
     for (var id in Game.creeps) {
         Game.creeps[id].loJob()
     }
-
-	utils.loWarn("CPU", Game.cpu)
+	brain.closeTick()
 }

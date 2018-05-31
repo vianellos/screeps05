@@ -152,15 +152,15 @@ Room.prototype.canBuildAt = function(sx, sy, max) {
 }
 
 Room.prototype.maxCreep = function() {
-	if (globals.maxcreep) {
+	utils.loLog("maxcreep", this.structures)
+	if (globals.maxcreep!=0) {
 		return globals.maxcreep
 	}
 	else {
 		maxcreep=10
-		if (this.structures) {
-			for (var id in this.structures) {
-				utils.loLog("strucure maxcreep", this.structures[id], id)
-			}
+		st=this.getStruCont();
+		if (st.container && st.container>0) {
+			maxcreep=15
 		}
 		globals.maxcreep=maxcreep
 		return globals.maxcreep
@@ -168,12 +168,36 @@ Room.prototype.maxCreep = function() {
 }
 
 Room.prototype.minCreep = function() {
-	if (globals.mincreep) {
+	if (globals.mincreep!=0) {
 		return globals.mincreep
 	}
 	else {
 		mincreep=1
+		st=this.getStruCont();
+		if (st.container && st.container>0) {
+			maxcreep=3
+		}
 		globals.mincreep=mincreep
 		return globals.mincreep
 	}
+}
+
+Room.prototype.getStruCont = function() {
+	if (this.memory.structcount==0) {
+		st=this.find(FIND_STRUCTURES);
+		this.memory.structcount={}
+		if (st) {
+			for (var id in st) {
+				if (!this.memory.structcount[st[id].structureType]) {
+					this.memory.structcount[st[id].structureType]=0
+				}
+				this.memory.structcount[st[id].structureType]++
+			}
+		}
+	}
+	return this.memory.structcount
+}
+
+Room.prototype.loInit = function() {
+	this.memory.structcount=0
 }

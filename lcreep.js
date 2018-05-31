@@ -1,4 +1,5 @@
 Creep.prototype.loJob = function() {
+	//this.suicide()
 	if (!this.memory.role) {
 		this.suicide()
 		return false
@@ -44,6 +45,7 @@ Creep.prototype.checkTimeToLive = function() {
 }
 
 Creep.prototype.loHarvest = function() {
+	//utils.loLog("loHarvest "+this.memory.jobstep, this.memory, this.name)
 	switch(this.memory.jobstep) {
 		case 0:
 			if (this.setSourceTarget()) {
@@ -51,6 +53,7 @@ Creep.prototype.loHarvest = function() {
 				this.loHarvest()
 			}
 			else {
+				brain.stuckinfo(this.memory.role, this.memory.jobstatus, this.memory.jobstep, 1)
 				this.goToPark();
 				fil={filter: (i) => i.structureType == STRUCTURE_CONTAINER }
 				tg=this.pos.findClosestByPath(FIND_STRUCTURES, fil);
@@ -67,6 +70,7 @@ Creep.prototype.loHarvest = function() {
 			}
 			else {
 				if (mo!=0) {
+					brain.stuckinfo(this.memory.role, this.memory.jobstatus, this.memory.jobstep, 1)
 					this.memory.jobstep=0
 					this.loHarvest()
 				}
@@ -76,7 +80,7 @@ Creep.prototype.loHarvest = function() {
 			if (this.carry.energy<this.carryCapacity) {
 				ac=this.loAction("harvest")
 				if (ac!=0) {
-					utils.loLog("loAction harvest error", ac, this.name)
+					brain.stuckinfo(this.memory.role, this.memory.jobstatus, this.memory.jobstep, 1)
 					this.memory.jobstep=0
 				}
 			}
@@ -96,6 +100,7 @@ Creep.prototype.loadEnergy = function() {
 				this.memory.jobstep=1
 			}
 			else {
+				brain.stuckinfo(this.memory.role, this.memory.jobstatus, this.memory.jobstep, 1)
 				this.goToPark();
 				globals.roles[this.memory.role].toCreate=false
 			}
@@ -107,6 +112,7 @@ Creep.prototype.loadEnergy = function() {
 			}
 			else {
 				if (mo!=0) {
+					brain.stuckinfo(this.memory.role, this.memory.jobstatus, this.memory.jobstep, 1)
 					this.memory.jobstep=0
 				}
 			}
@@ -120,7 +126,7 @@ Creep.prototype.loadEnergy = function() {
 					ac=this.loAction("harvest")
 				}
 				if (ac!=0) {
-					utils.loLog("loAction loaden error", ac, this.name)
+					brain.stuckinfo(this.memory.role, this.memory.jobstatus, this.memory.jobstep, 1)
 					this.memory.jobstep=0
 				}
 			}
@@ -141,22 +147,22 @@ Creep.prototype.unloadEnergy = function() {
 				this.unloadEnergy()
 			}
 			else {
+				brain.stuckinfo(this.memory.role, this.memory.jobstatus, this.memory.jobstep, 1)
 				this.goToPark();
 				globals.roles[this.memory.role].toCreate=false
 			}
 		break;
 		case 1:
-			if (this.fatigue==0) {
-				mo=this.loMove()
-				if (mo==1) {
-					this.memory.jobstep=2
+			mo=this.loMove()
+			if (mo==1) {
+				this.memory.jobstep=2
+				this.unloadEnergy()
+			}
+			else {
+				if (mo!=0 && mo!=-11) {
+					brain.stuckinfo(this.memory.role, this.memory.jobstatus, this.memory.jobstep, 1)
+					this.memory.jobstep=0
 					this.unloadEnergy()
-				}
-				else {
-					if (mo!=0 && mo!=-11) {
-						this.memory.jobstep=0
-						this.unloadEnergy()
-					}
 				}
 			}
 		break;
@@ -164,6 +170,7 @@ Creep.prototype.unloadEnergy = function() {
 			if (this.carry.energy>0) {
 				ac=this.loAction("transfer", RESOURCE_ENERGY)
 				if (ac!=0) {
+					brain.stuckinfo(this.memory.role, this.memory.jobstatus, this.memory.jobstep, 1)
 					this.memory.jobstep=0
 				}
 			}
@@ -183,28 +190,28 @@ Creep.prototype.loBuild = function() {
 				this.memory.jobstep=1
 			}
 			else {
+				brain.stuckinfo(this.memory.role, this.memory.jobstatus, this.memory.jobstep, 1)
 				this.goToPark();
 				globals.roles[this.memory.role].toCreate=false
 			}
 		break;
 		case 1:
-			if (this.fatigue==0) {
 				mo=this.loMove()
 				if (mo==1) {
 					this.memory.jobstep=2
 				}
 				else {
 					if (mo!=0 && mo!=-11) {
+						brain.stuckinfo(this.memory.role, this.memory.jobstatus, this.memory.jobstep, 1)
 						this.memory.jobstep=0
 					}
 				}
-			}
 		break;
 		case 2:
 			if (this.carry.energy>0) {
 				ac=this.loAction("build")
 				if (ac!=0) {
-					utils.loLog("loAction build error", ac, this.name)
+					brain.stuckinfo(this.memory.role, this.memory.jobstatus, this.memory.jobstep, 1)
 					this.memory.jobstep=0
 				}
 			}
@@ -224,28 +231,28 @@ Creep.prototype.loUpgrade = function() {
 				this.memory.jobstep=1
 			}
 			else {
+				brain.stuckinfo(this.memory.role, this.memory.jobstatus, this.memory.jobstep, 1)
 				this.goToPark();
 				globals.roles[this.memory.role].toCreate=false
 			}
 		break;
 		case 1:
-			if (this.fatigue==0) {
 				mo=this.loMove()
 				if (mo==1) {
 					this.memory.jobstep=2
 				}
 				else {
 					if (mo!=0 && mo!=-11) {
+						brain.stuckinfo(this.memory.role, this.memory.jobstatus, this.memory.jobstep, 1)
 						this.memory.jobstep=0
 					}
 				}
-			}
 		break;
 		case 2:
 			if (this.carry.energy>0) {
 				ac=this.loAction("upgradeController")
 				if (ac!=0) {
-					utils.loLog("loAction build error", ac, this.name)
+					brain.stuckinfo(this.memory.role, this.memory.jobstatus, this.memory.jobstep, 1)
 					this.memory.jobstep=0
 				}
 			}
@@ -429,8 +436,13 @@ Creep.prototype.loMove= function() {
 			this.memory.lx=this.pos.x
 			this.memory.ly=this.pos.y
 			this.memory.lf=this.fatigue
-			res=this.moveByPath(Room.deserializePath(this.memory.sp))
-			return res
+			if (this.fatigue>0) {
+				return 0
+			}
+			else {
+				res=this.moveByPath(Room.deserializePath(this.memory.sp))
+				return res
+			}
 		}
 	}
 }
@@ -446,8 +458,7 @@ Creep.prototype.isArrived = function() {
 
 Creep.prototype.goToPark = function() {
 	this.say("P")
-	rx=Math.floor((Math.random() * 20) - 9);
-	ry=Math.floor((Math.random() * 20) - 9);
-	//this.move(BOTTOM_LEFT)
-	this.moveTo(globals.parkingx+rx, globals.parkingy+ry)
+	rx=globals.parkingx+Math.floor((Math.random() * 20) - 9);
+	ry=globals.parkingy+Math.floor((Math.random() * 20) - 9);
+	this.moveTo(rx, ry)
 }
