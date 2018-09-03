@@ -1,23 +1,16 @@
-brain=require("brain")
-require("spawner")
-require("lcreep")
-require("lroom")
-globals=require("globals")
+loVar=require("variables")
+loCon=require("constants")
 utils=require("utils")
+loInit=require("loinit")
+require("lroom")
+require("lspawn")
 
-
-
-brain.init()
-
+loInit.init();
 
 
 module.exports.loop = function () {
-	brain.tick()
-    for (var id in Game.spawns) {
-        Game.spawns[id].spawner()
-    }
-    for (var id in Game.creeps) {
-        Game.creeps[id].loJob()
-    }
-	brain.closeTick()
+	loInit.tick()
+	for (var sid in Game.spawns) {
+		Game.spawns[sid].spawn()
+	}
 }

@@ -9,37 +9,14 @@
 
 module.exports = {
     /** @param {Creep} creep **/
-    loLog: function(msg, val, name=false) {
+    log: function(msg, val, name=false) {
 		if (name) {
 			console.log(name+" -> "+msg+": "+JSON.stringify(val))
 		}
 		else {
         	console.log(msg+": "+JSON.stringify(val))
 		}
-    } ,
-	loWarn: function(msg, val, name=false) {
-		if (name) {
-			//console.log("WARNING: "+name+" -> "+msg+": "+JSON.stringify(val))
-		}
-		else {
-			//console.log("WARNING: "+msg+": "+JSON.stringify(val))
-		}
-	} ,
-	loError: function(msg, val, name=false) {
-		console.log("----------ERROR-----------")
-		if (name) {
-			console.log(name+" -> "+msg+": "+JSON.stringify(val))
-		}
-		else {
-			console.log(msg+": "+JSON.stringify(val))
-		}
-		console.log("------------------------------")
-	} ,
-	loCrLog: function(msg, val, name) {
-		if (name=='upg4_4') {
-			console.log(name+" -> "+msg+": "+JSON.stringify(val))
-		}
-	} ,
+    },
 	cleanCreeps: function() {
 		for(var i in Memory.creeps) {
 		    if(!Game.creeps[i]) {
@@ -48,10 +25,26 @@ module.exports = {
 		    }
 		}
 	},
+	countCreeps: function() {
+		tot=0
+		for (var id in Game.creeps) {
+			tot++
+			loVar.roles[Game.creeps[id].memory.role].current++
+		}
+		loVar.creepsNumber=tot
+		return tot
+	},
     getGoals: function (gro, gt, gra) {
         let goals = _.map(gro.find(gt), function(source) {
                 return { pos: source.pos, range: gra };
             });
         return goals
-    }
+    },
+	calcCost: function (body) {
+		cost=0;
+		for (var bpid in body) {
+			cost+=BODYPART_COST[body[bpid]]
+		}
+		return cost
+	}
 };
